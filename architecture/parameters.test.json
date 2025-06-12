@@ -1,0 +1,43 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentParameters.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "environmentName": {
+      "value": "test"
+    },
+    "appName": {
+      "value": "innovation"
+    },
+    "location": {
+      "value": "East US"
+    },
+    "containerAppsTier": {
+      "value": {
+        "consumption": false,
+        "workloadProfile": "D4"
+      }
+    },
+    "functionsTier": {
+      "value": {
+        "sku": "EP1",
+        "tier": "ElasticPremium"
+      }
+    },
+    "searchTier": {
+      "value": {
+        "sku": "basic",
+        "replicaCount": 1,
+        "partitionCount": 1
+      }
+    },
+    "tags": {
+      "value": {
+        "Environment": "test",
+        "Project": "Innovation",
+        "ManagedBy": "Bicep",
+        "CostCenter": "Testing",
+        "Owner": "QATeam"
+      }
+    }
+  }
+}

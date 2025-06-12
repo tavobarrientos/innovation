@@ -1,0 +1,45 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentParameters.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "environmentName": {
+      "value": "prod"
+    },
+    "appName": {
+      "value": "innovation"
+    },
+    "location": {
+      "value": "East US"
+    },
+    "containerAppsTier": {
+      "value": {
+        "consumption": false,
+        "workloadProfile": "D8"
+      }
+    },
+    "functionsTier": {
+      "value": {
+        "sku": "EP2",
+        "tier": "ElasticPremium"
+      }
+    },
+    "searchTier": {
+      "value": {
+        "sku": "standard",
+        "replicaCount": 2,
+        "partitionCount": 1
+      }
+    },
+    "tags": {
+      "value": {
+        "Environment": "prod",
+        "Project": "Innovation",
+        "ManagedBy": "Bicep",
+        "CostCenter": "Production",
+        "Owner": "DevOpsTeam",
+        "Backup": "Required",
+        "Monitoring": "Critical"
+      }
+    }
+  }
+}
