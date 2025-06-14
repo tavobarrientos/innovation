@@ -2,6 +2,11 @@ using Azure.Storage.Blobs;
 
 var builder = WebApplication.CreateBuilder(args);
 
+if (builder.Environment.IsDevelopment()) // Load user secrets in development environment
+{
+    builder.Configuration.AddUserSecrets<Program>();
+}
+
 // Add services to the container.
 
 builder.Services.AddControllers();
@@ -10,7 +15,7 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
 // Configure Azure Blob Storage
-builder.Services.AddSingleton(x => new BlobServiceClient(builder.Configuration.GetConnectionString("AzureStorage")));
+builder.Services.AddSingleton(x => new BlobServiceClient(builder.Configuration.GetValue<string>("BlobStorage:ConnectionString")));
 
 var app = builder.Build();
 
