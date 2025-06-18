@@ -1,0 +1,136 @@
+/* Custom scrollbar for messages */
+.overflow-y-auto::-webkit-scrollbar {
+  width: 6px;
+}
+
+.overflow-y-auto::-webkit-scrollbar-track {
+  background: #f1f5f9;
+  border-radius: 3px;
+}
+
+.overflow-y-auto::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 3px;
+}
+
+.overflow-y-auto::-webkit-scrollbar-thumb:hover {
+  background: #94a3b8;
+}
+
+/* Smooth animations */
+.transition-colors {
+  transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+.transition-all {
+  transition: all 0.2s ease;
+}
+
+/* Message animations */
+.flex > div {
+  animation: slideIn 0.3s ease-out;
+}
+
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Typing indicator animation */
+@keyframes bounce {
+  0%, 80%, 100% {
+    transform: scale(0);
+    opacity: 0.5;
+  }
+  40% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+.animate-bounce {
+  animation: bounce 1.4s ease-in-out infinite both;
+}
+
+/* Auto-resize textarea */
+textarea {
+  resize: none;
+  overflow: hidden;
+}
+
+/* Focus states */
+.focus\:ring-2:focus {
+  outline: none;
+  box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.5);
+}
+
+/* Hover effects */
+.hover\:bg-gray-100:hover {
+  background-color: #f3f4f6;
+}
+
+.hover\:bg-blue-700:hover {
+  background-color: #1d4ed8;
+}
+
+.hover\:text-red-500:hover {
+  color: #ef4444;
+}
+
+/* Gradient backgrounds */
+.bg-gradient-to-r {
+  background: linear-gradient(to right, #3b82f6, #8b5cf6);
+}
+
+/* Message bubble styling */
+.rounded-2xl {
+  border-radius: 1rem;
+}
+
+.rounded-tl-md {
+  border-top-left-radius: 0.375rem;
+}
+
+.rounded-tr-md {
+  border-top-right-radius: 0.375rem;
+}
+
+/* Chat session item styling */
+.group:hover .opacity-0 {
+  opacity: 1;
+}
+
+/* Quick action buttons */
+button[class*="rounded-full"] {
+  border: 1px solid transparent;
+}
+
+button[class*="rounded-full"]:hover {
+  border-color: #d1d5db;
+}
+
+/* Loading states */
+.disabled\:bg-gray-300:disabled {
+  background-color: #d1d5db;
+  cursor: not-allowed;
+}
+
+/* Mobile responsiveness */
+@media (max-width: 768px) {
+  .w-80 {
+    width: 100%;
+    position: absolute;
+    z-index: 10;
+    height: 100%;
+  }
+  
+  .flex-1 {
+    margin-left: 0;
+  }
+}

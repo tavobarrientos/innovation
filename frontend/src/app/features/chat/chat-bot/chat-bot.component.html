@@ -1,0 +1,191 @@
+<div class="flex h-screen bg-gray-100">
+  <!-- Sidebar - Chat Sessions -->
+  <div class="w-80 bg-white border-r border-gray-200 flex flex-col">
+    <!-- Header -->
+    <div class="p-4 border-b border-gray-200">
+      <div class="flex items-center justify-between">
+        <h2 class="text-lg font-semibold text-gray-900">AI Chat Assistant</h2>
+        <button
+          (click)="startNewChat()"
+          class="bg-blue-600 hover:bg-blue-700 text-white p-2 rounded-lg transition-colors"
+          title="New Chat">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
+          </svg>
+        </button>
+      </div>
+    </div>
+
+    <!-- Chat Sessions List -->
+    <div class="flex-1 overflow-y-auto">
+      <div class="p-2">
+        <div 
+          *ngFor="let session of sessions"
+          (click)="selectSession(session)"
+          class="group flex items-center justify-between p-3 rounded-lg cursor-pointer transition-colors hover:bg-gray-100"
+          [class.bg-blue-50]="currentSession?.id === session.id"
+          [class.border-l-4]="currentSession?.id === session.id"
+          [class.border-blue-500]="currentSession?.id === session.id">
+          
+          <div class="flex-1 min-w-0">
+            <p class="text-sm font-medium text-gray-900 truncate">
+              {{ session.title }}
+            </p>
+            <p class="text-xs text-gray-500">
+              {{ session.updatedAt | date:'short' }}
+            </p>
+            <p class="text-xs text-gray-400">
+              {{ session.messages.length }} messages
+            </p>
+          </div>
+          
+          <button
+            (click)="deleteSession(session, $event)"
+            class="opacity-0 group-hover:opacity-100 p-1 text-gray-400 hover:text-red-500 transition-all">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
+            </svg>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Sidebar Footer -->
+    <div class="p-4 border-t border-gray-200">
+      <button
+        (click)="clearAllChats()"
+        class="w-full text-left p-2 text-sm text-gray-600 hover:text-red-600 hover:bg-red-50 rounded transition-colors">
+        Clear All Chats
+      </button>
+    </div>
+  </div>
+
+  <!-- Main Chat Area -->
+  <div class="flex-1 flex flex-col">
+    <!-- Chat Header -->
+    <div class="bg-white border-b border-gray-200 p-4">
+      <div class="flex items-center">
+        <div class="w-8 h-8 bg-gradient-to-r from-blue-500 to-purple-600 rounded-full flex items-center justify-center mr-3">
+          <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"/>
+          </svg>
+        </div>
+        <div>
+          <h3 class="text-lg font-semibold text-gray-900">
+            {{ currentSession?.title || 'AI Chat Assistant' }}
+          </h3>
+          <p class="text-sm text-gray-500">
+            <span *ngIf="isTyping" class="text-blue-600">AI is typing...</span>
+            <span *ngIf="!isTyping">Ready to help</span>
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Messages Area -->
+    <div 
+      #messagesContainer
+      class="flex-1 overflow-y-auto p-4 space-y-4 bg-gray-50">
+      
+      <div 
+        *ngFor="let message of currentSession?.messages"
+        class="flex"
+        [class.justify-end]="message.sender === 'user'"
+        [class.justify-start]="message.sender === 'bot'">
+        
+        <!-- Bot Message -->
+        <div *ngIf="message.sender === 'bot'" class="flex items-start max-w-3xl">
+          <div class="w-8 h-8 bg-gradient-to-r from-blue-500 to-purple-600 rounded-full flex items-center justify-center mr-3 mt-1">
+            <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"/>
+            </svg>
+          </div>
+          <div class="bg-white rounded-2xl rounded-tl-md p-4 shadow-sm border">
+            <p class="text-gray-800 whitespace-pre-wrap">{{ message.content }}</p>
+            <p class="text-xs text-gray-500 mt-2">{{ getFormattedTime(message.timestamp) }}</p>
+          </div>
+        </div>
+
+        <!-- User Message -->
+        <div *ngIf="message.sender === 'user'" class="flex items-start max-w-3xl">
+          <div class="bg-blue-600 rounded-2xl rounded-tr-md p-4 shadow-sm mr-3">
+            <p class="text-white whitespace-pre-wrap">{{ message.content }}</p>
+            <p class="text-blue-100 text-xs mt-2">{{ getFormattedTime(message.timestamp) }}</p>
+          </div>
+          <div class="w-8 h-8 bg-gray-300 rounded-full flex items-center justify-center mt-1">
+            <svg class="w-4 h-4 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
+            </svg>
+          </div>
+        </div>
+      </div>
+
+      <!-- Typing Indicator -->
+      <div *ngIf="isTyping" class="flex justify-start">
+        <div class="flex items-start max-w-3xl">
+          <div class="w-8 h-8 bg-gradient-to-r from-blue-500 to-purple-600 rounded-full flex items-center justify-center mr-3 mt-1">
+            <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"/>
+            </svg>
+          </div>
+          <div class="bg-white rounded-2xl rounded-tl-md p-4 shadow-sm border">
+            <div class="flex space-x-1">
+              <div class="w-2 h-2 bg-gray-400 rounded-full animate-bounce"></div>
+              <div class="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style="animation-delay: 0.1s"></div>
+              <div class="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style="animation-delay: 0.2s"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Message Input Area -->
+    <div class="bg-white border-t border-gray-200 p-4">
+      <div class="flex space-x-3">
+        <div class="flex-1">
+          <textarea
+            #messageInput
+            [(ngModel)]="newMessage"
+            (keydown)="onKeyPress($event)"
+            placeholder="Type your message... (Press Enter to send, Shift+Enter for new line)"
+            rows="1"
+            class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none"
+            style="min-height: 44px; max-height: 120px;">
+          </textarea>
+        </div>
+        <button
+          (click)="sendMessage()"
+          [disabled]="!newMessage.trim() || isTyping"
+          class="bg-blue-600 hover:bg-blue-700 disabled:bg-gray-300 disabled:cursor-not-allowed text-white p-3 rounded-lg transition-colors">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"/>
+          </svg>
+        </button>
+      </div>
+      
+      <!-- Quick Actions -->
+      <div class="flex flex-wrap gap-2 mt-3">
+        <button
+          (click)="newMessage = 'Help me create a new document'; sendMessage()"
+          class="px-3 py-1 bg-gray-100 hover:bg-gray-200 text-gray-700 text-sm rounded-full transition-colors">
+          📄 Create Document
+        </button>
+        <button
+          (click)="newMessage = 'Summarize my recent documents'; sendMessage()"
+          class="px-3 py-1 bg-gray-100 hover:bg-gray-200 text-gray-700 text-sm rounded-full transition-colors">
+          📊 Summarize
+        </button>
+        <button
+          (click)="newMessage = 'Search through my documents'; sendMessage()"
+          class="px-3 py-1 bg-gray-100 hover:bg-gray-200 text-gray-700 text-sm rounded-full transition-colors">
+          🔍 Search
+        </button>
+        <button
+          (click)="newMessage = 'Help me organize my files'; sendMessage()"
+          class="px-3 py-1 bg-gray-100 hover:bg-gray-200 text-gray-700 text-sm rounded-full transition-colors">
+          📁 Organize
+        </button>
+      </div>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,193 @@
+<div class="min-h-screen bg-gray-100 p-8">
+  <div class="max-w-4xl mx-auto">
+    <!-- Header -->
+    <div class="bg-white rounded-lg shadow-md p-6 mb-6">
+      <div class="flex justify-between items-center">
+        <div>
+          <h1 class="text-3xl font-bold text-gray-900 mb-2">Upload Document</h1>
+          <button 
+            (click)="goBack()"
+            class="text-blue-600 hover:text-blue-800 text-sm flex items-center">
+            ← Back to Documents
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Upload Form -->
+    <div class="bg-white rounded-lg shadow-md p-8">
+      <form [formGroup]="uploadForm" (ngSubmit)="onUpload()">
+        
+        <!-- File Upload Area -->
+        <div class="mb-8">
+          <label class="block text-sm font-medium text-gray-700 mb-4">Select File</label>
+          
+          <!-- Drag & Drop Area -->
+          <div 
+            class="relative border-2 border-dashed rounded-lg p-8 text-center transition-colors"
+            [ngClass]="{
+              'border-blue-400 bg-blue-50': isDragOver,
+              'border-gray-300 hover:border-gray-400': !isDragOver
+            }"
+            (dragover)="onDragOver($event)"
+            (dragleave)="onDragLeave($event)"
+            (drop)="onDrop($event)">
+            
+            <div *ngIf="!selectedFile">
+              <svg class="mx-auto h-12 w-12 text-gray-400 mb-4" stroke="currentColor" fill="none" viewBox="0 0 48 48">
+                <path d="M28 8H12a4 4 0 00-4 4v20m32-12v8m0 0v8a4 4 0 01-4 4H12a4 4 0 01-4-4v-4m32-4l-3.172-3.172a4 4 0 00-5.656 0L28 28M8 32l9.172-9.172a4 4 0 015.656 0L28 28m0 0l4 4m4-24h8m-4-4v8m-12 4h.02" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+              <p class="text-lg text-gray-600 mb-2">Drag and drop your file here, or</p>
+              <label class="cursor-pointer">
+                <span class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-lg transition-colors inline-block">
+                  Browse Files
+                </span>                <input type="file" class="hidden" (change)="onFileSelected($event)" accept=".txt,.json,.md,.markdown,.pdf">
+              </label>
+              <p class="text-sm text-gray-500 mt-2">Supported formats: TXT, JSON, Markdown (.md), PDF</p>
+            </div>            <!-- Selected File Display -->
+            <div *ngIf="selectedFile" class="flex items-center justify-between bg-gray-50 rounded-lg p-4">
+              <div class="flex items-center">
+                <!-- File Type Icons -->
+                <div class="h-8 w-8 mr-3">
+                  <!-- TXT File Icon -->
+                  <svg *ngIf="getFileExtension() === 'txt'" class="h-8 w-8 text-gray-600" fill="currentColor" viewBox="0 0 20 20">
+                    <path fill-rule="evenodd" d="M4 4a2 2 0 012-2h4.586A2 2 0 0112 2.586L15.414 6A2 2 0 0116 7.414V16a2 2 0 01-2 2H6a2 2 0 01-2-2V4zm2 6a1 1 0 011-1h6a1 1 0 110 2H7a1 1 0 01-1-1zm1 3a1 1 0 100 2h6a1 1 0 100-2H7z" clip-rule="evenodd"/>
+                  </svg>
+                  <!-- JSON File Icon -->
+                  <svg *ngIf="getFileExtension() === 'json'" class="h-8 w-8 text-yellow-600" fill="currentColor" viewBox="0 0 20 20">
+                    <path fill-rule="evenodd" d="M3 4a1 1 0 011-1h12a1 1 0 011 1v2a1 1 0 01-1 1H4a1 1 0 01-1-1V4zM3 10a1 1 0 011-1h6a1 1 0 011 1v6a1 1 0 01-1 1H4a1 1 0 01-1-1v-6zM14 9a1 1 0 00-1 1v6a1 1 0 001 1h2a1 1 0 001-1v-6a1 1 0 00-1-1h-2z" clip-rule="evenodd"/>
+                  </svg>
+                  <!-- Markdown File Icon -->
+                  <svg *ngIf="getFileExtension() === 'md' || getFileExtension() === 'markdown'" class="h-8 w-8 text-blue-600" fill="currentColor" viewBox="0 0 20 20">
+                    <path fill-rule="evenodd" d="M4 4a2 2 0 012-2h4.586A2 2 0 0112 2.586L15.414 6A2 2 0 0116 7.414V16a2 2 0 01-2 2H6a2 2 0 01-2-2V4zm4 2a1 1 0 000 2h4a1 1 0 100-2H8zm0 4a1 1 0 100 2h4a1 1 0 100-2H8zm-1 5a1 1 0 011-1h2a1 1 0 110 2H8a1 1 0 01-1-1z" clip-rule="evenodd"/>
+                  </svg>
+                  <!-- PDF File Icon -->
+                  <svg *ngIf="getFileExtension() === 'pdf'" class="h-8 w-8 text-red-600" fill="currentColor" viewBox="0 0 20 20">
+                    <path fill-rule="evenodd" d="M4 4a2 2 0 012-2h4.586A2 2 0 0112 2.586L15.414 6A2 2 0 0116 7.414V16a2 2 0 01-2 2H6a2 2 0 01-2-2V4zm6 2a1 1 0 00-1 1v6a1 1 0 102 0V9.414l1.293 1.293a1 1 0 001.414-1.414l-3-3A1 1 0 0010 6z" clip-rule="evenodd"/>
+                  </svg>
+                  <!-- Default File Icon -->
+                  <svg *ngIf="!['txt', 'json', 'md', 'markdown', 'pdf'].includes(getFileExtension())" class="h-8 w-8 text-gray-500" fill="currentColor" viewBox="0 0 20 20">
+                    <path fill-rule="evenodd" d="M4 4a2 2 0 012-2h4.586A2 2 0 0112 2.586L15.414 6A2 2 0 0116 7.414V16a2 2 0 01-2 2H6a2 2 0 01-2-2V4zm2 6a1 1 0 011-1h6a1 1 0 110 2H7a1 1 0 01-1-1zm1 3a1 1 0 100 2h6a1 1 0 100-2H7z" clip-rule="evenodd"/>
+                  </svg>
+                </div>
+                <div>
+                  <p class="font-medium text-gray-900">{{ selectedFile.name }}</p>
+                  <p class="text-sm text-gray-500">{{ getFileSize() }} • {{ getFileExtension().toUpperCase() }}</p>
+                </div>
+              </div>
+              <button 
+                type="button"
+                (click)="removeFile()"
+                class="text-red-600 hover:text-red-800 p-1">
+                <svg class="h-5 w-5" fill="currentColor" viewBox="0 0 20 20">
+                  <path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd"/>
+                </svg>
+              </button>
+            </div>            <!-- File Type Warning -->
+            <div *ngIf="selectedFile && !isValidFileType()" class="mt-4 p-3 bg-yellow-50 border border-yellow-200 rounded-lg">
+              <p class="text-sm text-yellow-800">
+                <strong>Warning:</strong> This file type is not supported. Please upload TXT, JSON, Markdown (.md), or PDF files.
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Document Information -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+          <!-- Title -->
+          <div>
+            <label for="title" class="block text-sm font-medium text-gray-700 mb-2">Document Title *</label>
+            <input
+              type="text"
+              id="title"
+              formControlName="title"
+              class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+              placeholder="Enter document title">
+            <div *ngIf="uploadForm.get('title')?.invalid && uploadForm.get('title')?.touched" class="mt-1 text-sm text-red-600">
+              <span *ngIf="uploadForm.get('title')?.errors?.['required']">Title is required</span>
+              <span *ngIf="uploadForm.get('title')?.errors?.['minlength']">Title must be at least 3 characters</span>
+            </div>
+          </div>
+
+          <!-- Category -->
+          <div>
+            <label for="category" class="block text-sm font-medium text-gray-700 mb-2">Category *</label>
+            <select
+              id="category"
+              formControlName="category"
+              class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+              <option value="general">General</option>
+              <option value="technical">Technical</option>
+              <option value="business">Business</option>
+              <option value="personal">Personal</option>
+              <option value="research">Research</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- Description -->
+        <div class="mb-6">
+          <label for="description" class="block text-sm font-medium text-gray-700 mb-2">Description</label>
+          <textarea
+            id="description"
+            formControlName="description"
+            rows="3"
+            class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+            placeholder="Optional description of the document"></textarea>
+        </div>
+
+        <!-- Tags -->
+        <div class="mb-8">
+          <label for="tags" class="block text-sm font-medium text-gray-700 mb-2">Tags</label>
+          <input
+            type="text"
+            id="tags"
+            formControlName="tags"
+            class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+            placeholder="Enter tags separated by commas">
+          <p class="mt-1 text-sm text-gray-500">Separate multiple tags with commas (e.g., important, work, project)</p>
+        </div>
+
+        <!-- Action Buttons -->
+        <div class="flex justify-end gap-3">
+          <button
+            type="button"
+            (click)="goBack()"
+            class="px-6 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors">
+            Cancel
+          </button>
+          <button
+            type="submit"
+            [disabled]="uploadForm.invalid || !selectedFile || !isValidFileType() || (loading$ | async)"
+            class="px-6 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 disabled:opacity-50 disabled:cursor-not-allowed transition-colors">
+            <span *ngIf="loading$ | async" class="inline-flex items-center">
+              <svg class="animate-spin -ml-1 mr-2 h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+              </svg>
+              Uploading...
+            </span>
+            <span *ngIf="!(loading$ | async)">Upload Document</span>
+          </button>
+        </div>
+      </form>
+    </div>
+
+    <!-- Upload Tips -->
+    <div class="mt-6 bg-blue-50 border-l-4 border-blue-400 p-4">
+      <div class="flex">
+        <div class="ml-3">
+          <p class="text-sm text-blue-700">
+            <strong>Upload Tips:</strong>
+          </p>          <ul class="mt-2 text-sm text-blue-600 list-disc list-inside">
+            <li>Supported file types: TXT, JSON, Markdown (.md), PDF</li>
+            <li>Maximum file size: 10MB</li>
+            <li>The document title will be auto-populated from the filename</li>
+            <li>Use descriptive tags to help organize and find your documents</li>
+            <li>JSON files will be formatted and validated automatically</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

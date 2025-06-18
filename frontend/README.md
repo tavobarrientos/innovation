@@ -1,6 +1,6 @@
 # Frontend
 
-This project was generated using [Angular CLI](https://github.com/angular/angular-cli) version 20.0.2.
+This project was generated using [Angular CLI](https://github.com/angular/angular-cli) version 19.2.15.
 
 ## Development server
 
@@ -53,25 +53,6 @@ ng e2e
 ```
 
 Angular CLI does not come with an end-to-end testing framework by default. You can choose one that suits your needs.
-
-## Docker Deployment
-
-This frontend application includes Docker support for containerized deployment. See [DOCKER.md](./DOCKER.md) for detailed instructions.
-
-### Quick Start with Docker
-
-```bash
-# Build the Docker image
-docker build -t innovation-frontend .
-
-# Run the container
-docker run -p 8080:80 innovation-frontend
-
-# Or use Docker Compose for development
-docker-compose up
-```
-
-The application will be available at `http://localhost:8080`.
 
 ## Additional Resources
 
